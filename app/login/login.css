@@ -1,4 +1,4 @@
-.register-page {
+.login-page {
   min-height: 100vh;
 
   background: #fff8ed;
@@ -12,8 +12,8 @@
   font-family: Arial, sans-serif;
 }
 
-.register-card {
-  width: 410px;
+.login-card {
+  width: 390px;
 
   background: white;
 
@@ -26,14 +26,13 @@
   box-shadow: 0 6px 20px rgba(80, 60, 40, 0.08);
 }
 
-.register-logo {
+.login-logo {
   width: 48px;
   height: 48px;
 
   margin: 0 auto 20px;
 
   background: #b86b22;
-
   color: white;
 
   display: flex;
@@ -46,7 +45,7 @@
   font-size: 16px;
 }
 
-.register-card h1 {
+.login-card h1 {
   text-align: center;
 
   color: #493a2a;
@@ -56,25 +55,22 @@
   font-size: 28px;
 }
 
-.register-subtitle {
+.login-subtitle {
   text-align: center;
 
   color: #887b6c;
 
   font-size: 13px;
 
-  line-height: 1.5;
-
   margin: 9px 0 30px;
 }
 
-.register-card form {
+.login-card form {
   display: flex;
-
   flex-direction: column;
 }
 
-.register-card label {
+.login-card label {
   color: #554a3f;
 
   font-size: 13px;
@@ -84,7 +80,7 @@
   margin-bottom: 7px;
 }
 
-.register-card input {
+.login-card input {
   padding: 12px;
 
   border: 1px solid #d9cbb9;
@@ -100,7 +96,7 @@
   background: white;
 }
 
-.register-card input:focus {
+.login-card input:focus {
   outline: none;
 
   border-color: #b86b22;
@@ -108,11 +104,11 @@
   box-shadow: 0 0 0 2px #f7ead7;
 }
 
-.register-card input::placeholder {
+.login-card input::placeholder {
   color: #aaa09a;
 }
 
-.register-card button {
+.login-card button {
   margin-top: 5px;
 
   padding: 12px;
@@ -132,11 +128,11 @@
   cursor: pointer;
 }
 
-.register-card button:hover {
+.login-card button:hover {
   background: #965619;
 }
 
-.login-text {
+.register-text {
   text-align: center;
 
   color: #887b6c;
@@ -146,7 +142,7 @@
   margin-top: 23px;
 }
 
-.login-text a {
+.register-text a {
   color: #a65f18;
 
   text-decoration: none;
@@ -154,7 +150,7 @@
   font-weight: bold;
 }
 
-.login-text a:hover {
+.register-text a:hover {
   text-decoration: underline;
 }
 
@@ -177,11 +173,11 @@
 }
 
 @media (max-width: 500px) {
-  .register-page {
+  .login-page {
     padding: 20px;
   }
 
-  .register-card {
+  .login-card {
     width: 100%;
 
     padding: 30px 24px;

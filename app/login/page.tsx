@@ -1,8 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../resources/firebase.js";
+import { auth } from"../resources/firebase.js";
+import "./login.css";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -13,6 +15,7 @@ export default function Login() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
+
       alert("Login successful!");
     } catch (error) {
       console.error(error);
@@ -21,37 +24,61 @@ export default function Login() {
   };
 
   return (
-    <main>
-      <h1>Student Login</h1>
+    <main className="login-page">
 
-      <form onSubmit={handleLogin}>
-        <label>Email</label>
+      <div className="login-card">
 
-        <input
-          type="email"
-          placeholder="Enter your email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+        <div className="login-logo">
+          CR
+        </div>
 
-        <label>Password</label>
+        <h1>Student Login</h1>
 
-        <input
-          type="password"
-          placeholder="Enter your password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+        <p className="login-subtitle">
+          Login to access your campus resources
+        </p>
 
-        <button type="submit">Login</button>
-      </form>
+        <form onSubmit={handleLogin}>
 
-      <p>
-  Don't have an account?{" "}
-  <a href="/register">Register here</a>
-</p>
+          <label>Email Address</label>
+
+          <input
+            type="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+
+          <label>Password</label>
+
+          <input
+            type="password"
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+
+          <button type="submit">
+            Login
+          </button>
+
+        </form>
+
+        <p className="register-text">
+          Don't have an account?{" "}
+          <Link href="/register">
+            Register here
+          </Link>
+        </p>
+
+        <Link href="/" className="home-link">
+          ← Back to Home
+        </Link>
+
+      </div>
+
     </main>
   );
 }

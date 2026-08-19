@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../resources/firebase.js";
@@ -10,15 +11,54 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleRegister = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    const cleanName = name.trim();
+    const cleanEmail = email.trim();
+
+    // Check name
+    if (!cleanName) {
+      alert("Please enter your full name.");
+      return;
+    }
+
+    // Check email
+    if (!cleanEmail || !cleanEmail.includes("@")) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
+    // Check password
+    if (password.length < 6) {
+      alert("Password must contain at least 6 characters.");
+      return;
+    }
+
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      await createUserWithEmailAndPassword(
+        auth,
+        cleanEmail,
+        password
+      );
+
       alert("Account created successfully!");
-    } catch (error) {
-      console.error(error);
-      alert("Registration failed. Please check your details.");
+
+      setName("");
+      setEmail("");
+      setPassword("");
+    } catch (error: any) {
+      console.error("Firebase registration error:", error);
+
+      if (error.code === "auth/email-already-in-use") {
+        alert("This email is already registered. Please login.");
+      } else if (error.code === "auth/invalid-email") {
+        alert("Please enter a valid email address.");
+      } else if (error.code === "auth/weak-password") {
+        alert("Password must contain at least 6 characters.");
+      } else {
+        alert("Registration failed. Please try again.");
+      }
     }
   };
 
@@ -26,70 +66,74 @@ export default function Register() {
     <main className="register-page">
       <div className="register-card">
 
-        <div className="register-header">
-          <div className="logo">CR</div>
-
-          <h1>Create Account</h1>
-
-          <p>
-            Join Campus Resource Hub and access your
-            college resources in one place.
-          </p>
+        <div className="register-logo">
+          CR
         </div>
 
-        <form onSubmit={handleRegister} className="register-form">
+        <h1>Create Account</h1>
 
-          <div className="form-group">
-            <label>Full Name</label>
+        <p className="register-subtitle">
+          Create your student account to access campus resources
+        </p>
 
-            <input
-              type="text"
-              placeholder="Enter your full name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-          </div>
+        <form onSubmit={handleRegister}>
 
-          <div className="form-group">
-            <label>Email Address</label>
+          <label htmlFor="name">
+            Full Name
+          </label>
 
-            <input
-              type="email"
-              placeholder="Enter your college email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
+          <input
+            id="name"
+            type="text"
+            placeholder="Enter your full name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
 
-          <div className="form-group">
-            <label>Password</label>
+          <label htmlFor="email">
+            Email Address
+          </label>
 
-            <input
-              type="password"
-              placeholder="Create a strong password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
+          <input
+            id="email"
+            type="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
 
-          <button type="submit" className="register-button">
+          <label htmlFor="password">
+            Password
+          </label>
+
+          <input
+            id="password"
+            type="password"
+            placeholder="Create a password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            minLength={6}
+            required
+          />
+
+          <button type="submit">
             Create Account
           </button>
 
         </form>
 
-        <div className="login-section">
-          <span>Already have an account?</span>
+        <p className="login-text">
+          Already have an account?{" "}
+          <Link href="/login">
+            Login here
+          </Link>
+        </p>
 
-          <a href="/login">Login here</a>
-        </div>
-
-        <div className="footer-text">
-          Campus Resource Hub • Student Portal
-        </div>
+        <Link href="/" className="home-link">
+          ← Back to Home
+        </Link>
 
       </div>
     </main>
