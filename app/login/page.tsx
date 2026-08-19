@@ -3,23 +3,60 @@
 import Link from "next/link";
 import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from"../resources/firebase.js";
+import { auth } from "../resources/firebase.js";
 import "./login.css";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
 
+    const cleanEmail = email.trim();
+
+    if (!cleanEmail || !cleanEmail.includes("@")) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
+    if (!password) {
+      alert("Please enter your password.");
+      return;
+    }
+
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      setLoading(true);
+
+      await signInWithEmailAndPassword(
+        auth,
+        cleanEmail,
+        password
+      );
 
       alert("Login successful!");
-    } catch (error) {
-      console.error(error);
-      alert("Login failed. Check your email and password.");
+
+      window.location.href = "/dashboard";
+    } catch (error: any) {
+      console.error("Firebase login error:", error);
+
+      if (
+        error.code === "auth/invalid-credential" ||
+        error.code === "auth/wrong-password"
+      ) {
+        alert("Incorrect email or password.");
+      } else if (error.code === "auth/user-not-found") {
+        alert("No account found with this email.");
+      } else if (error.code === "auth/invalid-email") {
+        alert("Please enter a valid email address.");
+      } else {
+        alert("Login failed. Please try again.");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -40,9 +77,12 @@ export default function Login() {
 
         <form onSubmit={handleLogin}>
 
-          <label>Email Address</label>
+          <label htmlFor="email">
+            Email Address
+          </label>
 
           <input
+            id="email"
             type="email"
             placeholder="Enter your email"
             value={email}
@@ -50,9 +90,12 @@ export default function Login() {
             required
           />
 
-          <label>Password</label>
+          <label htmlFor="password">
+            Password
+          </label>
 
           <input
+            id="password"
             type="password"
             placeholder="Enter your password"
             value={password}
@@ -60,8 +103,11 @@ export default function Login() {
             required
           />
 
-          <button type="submit">
-            Login
+          <button
+            type="submit"
+            disabled={loading}
+          >
+            {loading ? "Logging in..." : "Login"}
           </button>
 
         </form>

@@ -1,11 +1,14 @@
-"use client";
 import Link from "next/link";
 import "./home.css";
 
 export default function Home() {
   return (
     <main className="home-page">
-      <header className="navbar">
+
+      {/* Header */}
+
+      <header className="home-header">
+
         <div className="brand">
           <div className="brand-logo">CR</div>
 
@@ -18,194 +21,273 @@ export default function Home() {
         <nav>
           <Link href="/">Home</Link>
           <Link href="/resources">Resources</Link>
-          <Link href="/login" className="login-link">
-            Login
-          </Link>
-          <Link href="/register" className="register-link">
+          <Link href="/login">Login</Link>
+
+          <Link
+            href="/register"
+            className="register-nav"
+          >
             Register
           </Link>
         </nav>
+
       </header>
 
-      <section className="hero">
+
+      {/* Hero */}
+
+      <section className="hero-section">
+
         <div className="hero-content">
-          <span className="badge">🎓 STUDENT RESOURCE PLATFORM</span>
+
+          <span className="hero-label">
+            STUDENT RESOURCE PLATFORM
+          </span>
 
           <h2>
-            Everything you need for your
-            <span> college journey.</span>
+            Everything you need
+            <br />
+            for your studies.
           </h2>
 
           <p>
-            Find notes, previous year question papers and useful study
-            materials for your branch, year and semester — all in one place.
+            Find notes, previous year question papers,
+            study materials and other useful academic
+            resources in one simple place.
           </p>
 
           <div className="hero-buttons">
-            <Link href="/resources" className="primary-btn">
-              Explore Resources →
+
+            <Link
+              href="/resources"
+              className="primary-button"
+            >
+              Explore Resources
             </Link>
 
-            <Link href="/register" className="secondary-btn">
+            <Link
+              href="/register"
+              className="secondary-button"
+            >
               Create Account
             </Link>
+
           </div>
+
         </div>
 
         <div className="hero-card">
-          <div className="card-top">
-            <span>Resource Hub</span>
-            <span className="online">● Online</span>
+
+          <div className="hero-card-top">
+            <span>QUICK ACCESS</span>
+            <span>● Online</span>
           </div>
 
-          <div className="big-number">24+</div>
+          <h3>Study smarter with organized resources.</h3>
 
-          <p>Academic resources available</p>
-
-          <div className="stats">
+          <div className="mini-resource">
+            <span>📄</span>
             <div>
-              <strong>12</strong>
-              <span>Notes</span>
-            </div>
-
-            <div>
-              <strong>8</strong>
-              <span>Question Papers</span>
-            </div>
-
-            <div>
-              <strong>4</strong>
-              <span>Study Guides</span>
+              <strong>Question Papers</strong>
+              <small>Previous examinations</small>
             </div>
           </div>
+
+          <div className="mini-resource">
+            <span>📚</span>
+            <div>
+              <strong>Notes</strong>
+              <small>Subject study materials</small>
+            </div>
+          </div>
+
+          <div className="mini-resource">
+            <span>🎓</span>
+            <div>
+              <strong>Study Resources</strong>
+              <small>Useful academic content</small>
+            </div>
+          </div>
+
         </div>
+
       </section>
 
-      <section className="search-section">
-        <div className="section-title">
-          <span>SEARCH</span>
-          <h2>Find Your Resources</h2>
-          <p>Select your academic details to find relevant resources.</p>
-        </div>
 
-        <div className="filters">
-          <div className="filter">
-            <label>Branch</label>
+      {/* Resource Categories */}
 
-            <select defaultValue="">
-              <option value="" disabled>
-                Select Branch
-              </option>
-              <option>CSE</option>
-              <option>ECE</option>
-              <option>EEE</option>
-              <option>MECH</option>
-              <option>CIVIL</option>
-            </select>
-          </div>
+      <section className="categories-section">
 
-          <div className="filter">
-            <label>Year</label>
+        <div className="section-heading">
+          <span>RESOURCE LIBRARY</span>
 
-            <select defaultValue="">
-              <option value="" disabled>
-                Select Year
-              </option>
-              <option>1st Year</option>
-              <option>2nd Year</option>
-              <option>3rd Year</option>
-              <option>4th Year</option>
-            </select>
-          </div>
+          <h2>What can you find?</h2>
 
-          <div className="filter">
-            <label>Semester</label>
-
-            <select defaultValue="">
-              <option value="" disabled>
-                Select Semester
-              </option>
-              <option>1st Semester</option>
-              <option>2nd Semester</option>
-            </select>
-          </div>
-
-          <Link href="/resources" className="search-btn">
-            Find Resources
-          </Link>
-        </div>
-      </section>
-
-      <section className="resources-section">
-        <div className="section-title">
-          <span>ACADEMICS</span>
-          <h2>Explore Resources</h2>
           <p>
-            Everything you need to prepare, learn and stay updated.
+            Access useful academic materials based on
+            your branch and semester.
           </p>
         </div>
 
-        <div className="resource-grid">
-          <Link href="/resources" className="resource-card">
-            <div className="resource-icon blue">📄</div>
+        <div className="category-grid">
+
+          <div className="category-card">
+
+            <div className="category-icon">
+              📄
+            </div>
 
             <h3>Previous Year Papers</h3>
 
             <p>
-              Practice with previous examination papers and understand
-              important question patterns.
+              Practice with previous examination papers
+              and understand the question pattern.
             </p>
 
-            <span>Explore papers →</span>
-          </Link>
+            <Link href="/resources">
+              View Papers →
+            </Link>
 
-          <Link href="/resources" className="resource-card">
-            <div className="resource-icon purple">📚</div>
+          </div>
+
+
+          <div className="category-card">
+
+            <div className="category-icon">
+              📚
+            </div>
 
             <h3>Notes</h3>
 
             <p>
-              Access useful subject notes and study materials for your
-              semester.
+              Find useful subject notes and study
+              material for your semester.
             </p>
 
-            <span>View notes →</span>
-          </Link>
+            <Link href="/resources">
+              Browse Notes →
+            </Link>
 
-          <Link href="/resources" className="resource-card">
-            <div className="resource-icon orange">🎓</div>
+          </div>
 
-            <h3>Study Resources</h3>
+
+          <div className="category-card">
+
+            <div className="category-icon">
+              🎓
+            </div>
+
+            <h3>Study Materials</h3>
 
             <p>
-              Discover additional learning resources to support your academic
-              preparation.
+              Explore additional resources to support
+              your academic preparation.
             </p>
 
-            <span>Start learning →</span>
-          </Link>
+            <Link href="/resources">
+              Explore Materials →
+            </Link>
+
+          </div>
+
         </div>
+
       </section>
 
-      <section className="bottom-banner">
+
+      {/* How it works */}
+
+      <section className="how-section">
+
+        <div className="section-heading">
+
+          <span>SIMPLE PROCESS</span>
+
+          <h2>How Campus Resource Hub works</h2>
+
+        </div>
+
+        <div className="steps">
+
+          <div className="step">
+
+            <div className="step-number">
+              01
+            </div>
+
+            <h3>Create an account</h3>
+
+            <p>
+              Register using your email and create
+              your student account.
+            </p>
+
+          </div>
+
+
+          <div className="step">
+
+            <div className="step-number">
+              02
+            </div>
+
+            <h3>Select your details</h3>
+
+            <p>
+              Choose your branch, year and semester
+              to find relevant resources.
+            </p>
+
+          </div>
+
+
+          <div className="step">
+
+            <div className="step-number">
+              03
+            </div>
+
+            <h3>Start learning</h3>
+
+            <p>
+              Browse useful materials and prepare
+              for your examinations.
+            </p>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      {/* Footer */}
+
+      <footer className="home-footer">
+
         <div>
-          <span>WELCOME TO CAMPUS RESOURCE HUB</span>
-
-          <h2>Your academic resources, organized in one place.</h2>
-
+          <strong>Campus Resource Hub</strong>
           <p>
-            Create an account to get started with your student resource
-            portal.
+            A simple academic resource platform for students.
           </p>
         </div>
 
-        <Link href="/register">Get Started →</Link>
-      </section>
+        <div className="footer-links">
 
-      <footer>
-        <strong>Campus Resource Hub</strong>
-        <span>Student Academic Portal</span>
+          <Link href="/">Home</Link>
+
+          <Link href="/resources">
+            Resources
+          </Link>
+
+          <Link href="/login">
+            Login
+          </Link>
+
+        </div>
+
       </footer>
+
     </main>
   );
 }

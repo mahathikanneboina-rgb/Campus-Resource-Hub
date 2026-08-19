@@ -11,25 +11,24 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleRegister = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
 
     const cleanName = name.trim();
     const cleanEmail = email.trim();
 
-    // Check name
     if (!cleanName) {
       alert("Please enter your full name.");
       return;
     }
 
-    // Check email
     if (!cleanEmail || !cleanEmail.includes("@")) {
       alert("Please enter a valid email address.");
       return;
     }
 
-    // Check password
     if (password.length < 6) {
       alert("Password must contain at least 6 characters.");
       return;
@@ -48,7 +47,7 @@ export default function Register() {
       setEmail("");
       setPassword("");
     } catch (error: any) {
-      console.error("Firebase registration error:", error);
+      console.error("Firebase error:", error);
 
       if (error.code === "auth/email-already-in-use") {
         alert("This email is already registered. Please login.");
@@ -64,6 +63,7 @@ export default function Register() {
 
   return (
     <main className="register-page">
+
       <div className="register-card">
 
         <div className="register-logo">
@@ -136,6 +136,7 @@ export default function Register() {
         </Link>
 
       </div>
+
     </main>
   );
 }
