@@ -15,6 +15,7 @@ export default function Dashboard() {
       if (user) {
         setUserEmail(user.email || "");
         setCheckingUser(false);
+
       } else {
         window.location.href = "/login";
       }
