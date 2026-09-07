@@ -1,85 +1,137 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db, isFirebaseConfigured } from "../resources/firebase";
 import "./resources.css";
 
-const resources = [
-  {
-    title: "DBMS Previous Year Question Paper",
-    type: "Question Paper",
-    branch: "CSE",
-    year: "3rd Year",
-    semester: "1st Semester",
-  },
-  {
-    title: "Operating Systems Notes",
-    type: "Notes",
-    branch: "CSE",
-    year: "3rd Year",
-    semester: "1st Semester",
-  },
-  {
-    title: "Data Structures Study Material",
-    type: "Study Material",
-    branch: "CSE",
-    year: "2nd Year",
-    semester: "2nd Semester",
-  },
-  {
-    title: "Computer Networks Notes",
-    type: "Notes",
-    branch: "CSE",
-    year: "3rd Year",
-    semester: "2nd Semester",
-  },
-  {
-    title: "Digital Electronics Question Paper",
-    type: "Question Paper",
-    branch: "ECE",
-    year: "2nd Year",
-    semester: "1st Semester",
-  },
-  {
-    title: "Engineering Mathematics Notes",
-    type: "Notes",
-    branch: "ECE",
-    year: "1st Year",
-    semester: "1st Semester",
-  },
-];
+type Resource = {
+  id: string;
+  title: string;
+  type: string;
+  branch: string;
+  year: string;
+  semester: string;
+  link: string;
+};
 
 export default function Resources() {
+  const [resources, setResources] = useState<Resource[]>([]);
   const [search, setSearch] = useState("");
   const [branch, setBranch] = useState("");
   const [year, setYear] = useState("");
   const [semester, setSemester] = useState("");
 
-  const filteredResources = resources.filter((resource) => {
-    const searchText = search.toLowerCase().trim();
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
 
-    const matchesSearch =
-      searchText === "" ||
-      resource.title.toLowerCase().includes(searchText) ||
-      resource.type.toLowerCase().includes(searchText) ||
-      resource.branch.toLowerCase().includes(searchText);
+  useEffect(() => {
+    const loadResources = async () => {
+      try {
+        setLoading(true);
+        setErrorMessage("");
 
-    const matchesBranch =
-      branch === "" || resource.branch === branch;
+        if (!isFirebaseConfigured()) {
+          setErrorMessage(
+            "Firebase is configured with placeholder values in .env.local. Real Firebase Web App configuration is required."
+          );
+          setLoading(false);
+          return;
+        }
 
-    const matchesYear =
-      year === "" || resource.year === year;
+        console.log("Connecting to Firestore collection 'resources'...");
 
-    const matchesSemester =
-      semester === "" || resource.semester === semester;
+        const fetchPromise = getDocs(collection(db, "resources"));
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(
+            () =>
+              reject(
+                new Error(
+                  "Firestore operation timed out (10s). Please verify internet connection and Firestore security rules."
+                )
+              ),
+            10000
+          )
+        );
 
-    return (
-      matchesSearch &&
-      matchesBranch &&
-      matchesYear &&
-      matchesSemester
-    );
-  });
+        const snapshot = await Promise.race([fetchPromise, timeoutPromise]);
+
+        console.log("Documents found:", snapshot.size);
+
+        const firestoreResources: Resource[] = snapshot.docs.map((doc) => {
+          const data = doc.data();
+
+          console.log("Document:", doc.id, data);
+
+          return {
+            id: doc.id,
+            title: data.title || "",
+            type: data.type || "",
+            branch: data.branch || "",
+            year: data.year || "",
+            semester: data.semester || "",
+            link: data.link || "",
+          };
+        });
+
+        setResources(firestoreResources);
+      } catch (error) {
+        console.error("FIREBASE ERROR:", error);
+
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Unable to load resources from Firebase."
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadResources();
+  }, []);
+
+  const filteredResources = resources.filter(
+    (resource) => {
+      const searchText =
+        search.toLowerCase().trim();
+
+      const matchesSearch =
+        searchText === "" ||
+        resource.title
+          .toLowerCase()
+          .includes(searchText) ||
+        resource.type
+          .toLowerCase()
+          .includes(searchText) ||
+        resource.branch
+          .toLowerCase()
+          .includes(searchText);
+
+      const matchesBranch =
+        branch === "" ||
+        resource.branch.toLowerCase() ===
+          branch.toLowerCase();
+
+      const matchesYear =
+        year === "" ||
+        resource.year.toLowerCase() ===
+          year.toLowerCase();
+
+      const matchesSemester =
+        semester === "" ||
+        resource.semester.toLowerCase() ===
+          semester.toLowerCase();
+
+      return (
+        matchesSearch &&
+        matchesBranch &&
+        matchesYear &&
+        matchesSemester
+      );
+    }
+  );
 
   const clearFilters = () => {
     setSearch("");
@@ -92,49 +144,49 @@ export default function Resources() {
     <main className="resources-page">
 
       {/* Header */}
-
       <header className="resources-header">
-
         <div>
           <h1>Campus Resource Hub</h1>
-          <p>Academic resources for students</p>
+
+          <p>
+            Academic resources for students
+          </p>
         </div>
 
         <nav className="resources-nav">
-          <Link href="/">Home</Link>
+          <Link href="/">
+            Home
+          </Link>
 
           <Link href="/dashboard">
             Dashboard
           </Link>
-        </nav>
 
+          <Link href="/admin">
+            Admin
+          </Link>
+        </nav>
       </header>
 
-
       {/* Introduction */}
-
       <section className="resources-intro">
-
         <span>RESOURCE LIBRARY</span>
 
-        <h2>Find Your Resources</h2>
+        <h2>
+          Find Your Resources
+        </h2>
 
         <p>
-          Search and filter useful academic materials
-          according to your branch, year and semester.
+          Search and filter useful academic
+          materials according to your branch,
+          year and semester.
         </p>
-
       </section>
 
-
-      {/* Search and Filters */}
-
+      {/* Filters */}
       <section className="filter-section">
 
-        {/* Search */}
-
         <div className="filter-box search-box">
-
           <label htmlFor="search">
             Search
           </label>
@@ -144,16 +196,13 @@ export default function Resources() {
             type="text"
             placeholder="Search resources..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) =>
+              setSearch(e.target.value)
+            }
           />
-
         </div>
 
-
-        {/* Branch */}
-
         <div className="filter-box">
-
           <label htmlFor="branch">
             Branch
           </label>
@@ -161,9 +210,10 @@ export default function Resources() {
           <select
             id="branch"
             value={branch}
-            onChange={(e) => setBranch(e.target.value)}
+            onChange={(e) =>
+              setBranch(e.target.value)
+            }
           >
-
             <option value="">
               All Branches
             </option>
@@ -187,16 +237,10 @@ export default function Resources() {
             <option value="CIVIL">
               CIVIL
             </option>
-
           </select>
-
         </div>
 
-
-        {/* Year */}
-
         <div className="filter-box">
-
           <label htmlFor="year">
             Year
           </label>
@@ -204,9 +248,10 @@ export default function Resources() {
           <select
             id="year"
             value={year}
-            onChange={(e) => setYear(e.target.value)}
+            onChange={(e) =>
+              setYear(e.target.value)
+            }
           >
-
             <option value="">
               All Years
             </option>
@@ -226,16 +271,10 @@ export default function Resources() {
             <option value="4th Year">
               4th Year
             </option>
-
           </select>
-
         </div>
 
-
-        {/* Semester */}
-
         <div className="filter-box">
-
           <label htmlFor="semester">
             Semester
           </label>
@@ -243,9 +282,10 @@ export default function Resources() {
           <select
             id="semester"
             value={semester}
-            onChange={(e) => setSemester(e.target.value)}
+            onChange={(e) =>
+              setSemester(e.target.value)
+            }
           >
-
             <option value="">
               All Semesters
             </option>
@@ -257,13 +297,8 @@ export default function Resources() {
             <option value="2nd Semester">
               2nd Semester
             </option>
-
           </select>
-
         </div>
-
-
-        {/* Clear */}
 
         <button
           className="clear-button"
@@ -274,137 +309,169 @@ export default function Resources() {
 
       </section>
 
-
-      {/* Resource List */}
-
+      {/* Resources */}
       <section className="resource-list">
 
         <div className="resource-heading">
-
           <div>
-            <h2>Available Resources</h2>
+            <h2>
+              Available Resources
+            </h2>
 
             <p>
               {filteredResources.length} resource
               {filteredResources.length !== 1
                 ? "s"
-                : ""} found
+                : ""}{" "}
+              found
             </p>
           </div>
-
         </div>
 
-
-        {/* No Results */}
-
-        {filteredResources.length === 0 ? (
-
+        {/* Loading */}
+        {loading && (
           <div className="no-resources">
 
             <div className="no-resource-icon">
-              🔍
+              ⏳
             </div>
 
             <h3>
-              No resources found
+              Loading resources...
             </h3>
 
             <p>
-              Try another search or change your filters.
+              Please wait while resources
+              are loaded from Firebase.
             </p>
 
-            <button
-              onClick={clearFilters}
-              className="reset-button"
-            >
-              Reset Search
-            </button>
-
           </div>
-
-        ) : (
-
-          /* Resource Cards */
-
-          <div className="resource-grid">
-
-            {filteredResources.map(
-              (resource, index) => (
-
-                <div
-                  className="resource-card"
-                  key={index}
-                >
-
-                  <div className="resource-icon">
-
-                    {resource.type === "Notes"
-                      ? "📚"
-                      : resource.type === "Question Paper"
-                      ? "📄"
-                      : "🎓"}
-
-                  </div>
-
-
-                  <span className="resource-type">
-                    {resource.type}
-                  </span>
-
-
-                  <h3>
-                    {resource.title}
-                  </h3>
-
-
-                  <div className="resource-details">
-
-                    <span>
-                      {resource.branch}
-                    </span>
-
-                    <span>
-                      {resource.year}
-                    </span>
-
-                    <span>
-                      {resource.semester}
-                    </span>
-
-                  </div>
-
-
-                  <Link
-                    className="view-button"
-                    href={`/resource?title=${encodeURIComponent(
-                      resource.title
-                    )}&type=${encodeURIComponent(
-                      resource.type
-                    )}&branch=${encodeURIComponent(
-                      resource.branch
-                    )}&year=${encodeURIComponent(
-                      resource.year
-                    )}&semester=${encodeURIComponent(
-                      resource.semester
-                    )}`}
-                  >
-                    View Resource
-                  </Link>
-
-                </div>
-
-              )
-            )}
-
-          </div>
-
         )}
+
+        {/* Firebase Error */}
+        {!loading && errorMessage && (
+          <div className="no-resources">
+
+            <div className="no-resource-icon">
+              ⚠️
+            </div>
+
+            <h3>
+              Firebase Error
+            </h3>
+
+            <p>
+              {errorMessage}
+            </p>
+
+          </div>
+        )}
+
+        {/* No resources */}
+        {!loading &&
+          !errorMessage &&
+          filteredResources.length === 0 && (
+            <div className="no-resources">
+
+              <div className="no-resource-icon">
+                🔍
+              </div>
+
+              <h3>
+                No resources found
+              </h3>
+
+              <p>
+                No resources are currently
+                available.
+              </p>
+
+              <button
+                onClick={clearFilters}
+                className="reset-button"
+              >
+                Reset Search
+              </button>
+
+            </div>
+          )}
+
+        {/* Resource cards */}
+        {!loading &&
+          !errorMessage &&
+          filteredResources.length > 0 && (
+            <div className="resource-grid">
+
+              {filteredResources.map(
+                (resource) => (
+
+                  <div
+                    className="resource-card"
+                    key={resource.id}
+                  >
+
+                    <div className="resource-icon">
+                      {resource.type === "Notes"
+                        ? "📚"
+                        : resource.type ===
+                          "Question Paper"
+                        ? "📄"
+                        : "🎓"}
+                    </div>
+
+                    <span className="resource-type">
+                      {resource.type}
+                    </span>
+
+                    <h3>
+                      {resource.title}
+                    </h3>
+
+                    <div className="resource-details">
+
+                      <span>
+                        {resource.branch}
+                      </span>
+
+                      <span>
+                        {resource.year}
+                      </span>
+
+                      <span>
+                        {resource.semester}
+                      </span>
+
+                    </div>
+
+                    <Link
+                      className="view-button"
+                      href={`/resources/${resource.id}`}
+                    >
+                      View Resource
+                    </Link>
+
+                    {resource.link && (
+                      <a
+                        href={resource.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="direct-link"
+                      >
+                        Open Resource ↗
+                      </a>
+                    )}
+
+                  </div>
+
+                )
+              )}
+
+            </div>
+          )}
 
       </section>
 
-
       {/* Footer */}
-
       <footer className="resources-footer">
 
         <p>
