@@ -18,6 +18,17 @@
   align-items: center;
 }
 
+@media (max-width: 600px) {
+  .resources-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .resources-header a {
+    margin-top: 8px;
+  }
+}
+
 .resources-header h1 {
   margin: 0;
 
@@ -270,6 +281,20 @@
   font-size: 17px;
 
   line-height: 1.4;
+}
+
+.resources-nav {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+@media (max-width: 600px) {
+  .resources-nav {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
 }
 
 .resource-details {

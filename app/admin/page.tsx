@@ -11,6 +11,9 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { db, isFirebaseConfigured } from "../resources/firebase";
+import { useRouter } from 'next/navigation';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../resources/firebase';
 import "./admin.css";
 
 // Resource type matching Firestore schema
@@ -35,6 +38,8 @@ export default function AdminPage(): import("react").JSX.Element {
 
   // UI state
   const [loading, setLoading] = useState(false);
+const [authLoading, setAuthLoading] = useState(true);
+const router = useRouter();
   const [loadingResources, setLoadingResources] = useState(true);
   const [resources, setResources] = useState<Resource[]>([]);
   const [editingId, setEditingId] = useState<string>("");
@@ -62,6 +67,18 @@ export default function AdminPage(): import("react").JSX.Element {
   useEffect(() => {
     fetchResources();
   }, []);
+
+  // Ensure user is authenticated
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        router.replace('/login');
+      } else {
+        setAuthLoading(false);
+      }
+    });
+    return () => unsubscribe();
+  }, [router]);
 
   // Populate form for editing
   const startEdit = (resource: Resource) => {
@@ -164,7 +181,10 @@ export default function AdminPage(): import("react").JSX.Element {
     }
   };
 
-  return (
+  if (authLoading) {
+  return <div className="admin-page"><p>Loading...</p></div>;
+}
+return (
     <main className="admin-page">
       <header className="admin-header">
         <div>
@@ -176,6 +196,14 @@ export default function AdminPage(): import("react").JSX.Element {
 
       <section className="admin-container">
         {/* Existing Resources List */}
+{/* Resource Statistics */}
+<div className="resource-stats">
+  <h3>Resource Statistics</h3>
+  <p>Total Resources: {resources.length}</p>
+  <p>Notes: {resources.filter(r => r.type === "Notes").length}</p>
+  <p>Question Papers: {resources.filter(r => r.type === "Question Paper").length}</p>
+  <p>Other Types: {resources.filter(r => r.type !== "Notes" && r.type !== "Question Paper").length}</p>
+</div>
         <div className="resource-list">
           <h2>{editingId ? "Edit Resource" : "All Resources"}</h2>
           {loadingResources ? (
