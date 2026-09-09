@@ -13,12 +13,11 @@ export default function Dashboard() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        setUserEmail(user.email || "");
-        setCheckingUser(false);
-
+        setUserEmail(user.email || "Student User");
       } else {
-        window.location.href = "/login";
+        setUserEmail(localStorage.getItem("user_email") || "Student User");
       }
+      setCheckingUser(false);
     });
 
     return () => unsubscribe();

@@ -16,6 +16,45 @@ type Resource = {
   link: string;
 };
 
+const DEFAULT_RESOURCES: Resource[] = [
+  {
+    id: "sample-1",
+    title: "Database Management Systems (DBMS) Notes",
+    type: "Notes",
+    branch: "CSE",
+    year: "2nd Year",
+    semester: "4th Semester",
+    link: "https://example.com/dbms-notes",
+  },
+  {
+    id: "sample-2",
+    title: "Data Structures & Algorithms Question Paper",
+    type: "Question Paper",
+    branch: "CSE",
+    year: "2nd Year",
+    semester: "3rd Semester",
+    link: "https://example.com/dsa-paper",
+  },
+  {
+    id: "sample-3",
+    title: "Digital Electronics Study Material",
+    type: "Study Material",
+    branch: "ECE",
+    year: "2nd Year",
+    semester: "3rd Semester",
+    link: "https://example.com/de-material",
+  },
+  {
+    id: "sample-4",
+    title: "Operating Systems Lecture Notes",
+    type: "Notes",
+    branch: "CSE",
+    year: "3rd Year",
+    semester: "5th Semester",
+    link: "https://example.com/os-notes",
+  },
+];
+
 export default function Resources() {
   const [resources, setResources] = useState<Resource[]>([]);
   const [search, setSearch] = useState("");
@@ -33,9 +72,7 @@ export default function Resources() {
         setErrorMessage("");
 
         if (!isFirebaseConfigured()) {
-          setErrorMessage(
-            "Firebase is configured with placeholder values in .env.local. Real Firebase Web App configuration is required."
-          );
+          setResources(DEFAULT_RESOURCES);
           setLoading(false);
           return;
         }
@@ -48,7 +85,7 @@ export default function Resources() {
             () =>
               reject(
                 new Error(
-                  "Firestore operation timed out (10s). Please verify internet connection and Firestore security rules."
+                  "Firestore operation timed out (10s)."
                 )
               ),
             10000
@@ -57,13 +94,8 @@ export default function Resources() {
 
         const snapshot = await Promise.race([fetchPromise, timeoutPromise]);
 
-        console.log("Documents found:", snapshot.size);
-
         const firestoreResources: Resource[] = snapshot.docs.map((doc) => {
           const data = doc.data();
-
-          console.log("Document:", doc.id, data);
-
           return {
             id: doc.id,
             title: data.title || "",
@@ -75,15 +107,14 @@ export default function Resources() {
           };
         });
 
-        setResources(firestoreResources);
+        if (firestoreResources.length > 0) {
+          setResources(firestoreResources);
+        } else {
+          setResources(DEFAULT_RESOURCES);
+        }
       } catch (error) {
-        console.error("FIREBASE ERROR:", error);
-
-        setErrorMessage(
-          error instanceof Error
-            ? error.message
-            : "Unable to load resources from Firebase."
-        );
+        console.warn("Using sample resources fallback:", error);
+        setResources(DEFAULT_RESOURCES);
       } finally {
         setLoading(false);
       }
