@@ -48,7 +48,10 @@ export default function Login() {
     } catch (error: any) {
       console.error("Firebase login error:", error);
       let message = "Failed to log in. Please check your credentials.";
-      if (
+      if (error?.code === "auth/invalid-api-key") {
+        // Specific handling for mis‑configured Firebase API key
+        message = "Firebase configuration error (invalid API key). Please verify the values in your .env.local file and in Vercel's environment variables.";
+      } else if (
         error?.code === "auth/invalid-credential" ||
         error?.code === "auth/user-not-found" ||
         error?.code === "auth/wrong-password"
