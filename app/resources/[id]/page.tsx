@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "../firebase";
+import { db, isFirebaseConfigured } from "../firebase";
 import "../resources.css";
 
 type Resource = {
@@ -16,6 +16,45 @@ type Resource = {
   semester: string;
   link: string;
 };
+
+const DEFAULT_RESOURCES: Resource[] = [
+  {
+    id: "sample-1",
+    title: "Database Management Systems (DBMS) Notes",
+    type: "Notes",
+    branch: "CSE",
+    year: "2nd Year",
+    semester: "4th Semester",
+    link: "https://example.com/dbms-notes",
+  },
+  {
+    id: "sample-2",
+    title: "Data Structures & Algorithms Question Paper",
+    type: "Question Paper",
+    branch: "CSE",
+    year: "2nd Year",
+    semester: "3rd Semester",
+    link: "https://example.com/dsa-paper",
+  },
+  {
+    id: "sample-3",
+    title: "Digital Electronics Study Material",
+    type: "Study Material",
+    branch: "ECE",
+    year: "2nd Year",
+    semester: "3rd Semester",
+    link: "https://example.com/de-material",
+  },
+  {
+    id: "sample-4",
+    title: "Operating Systems Lecture Notes",
+    type: "Notes",
+    branch: "CSE",
+    year: "3rd Year",
+    semester: "5th Semester",
+    link: "https://example.com/os-notes",
+  },
+];
 
 export default function ResourceDetailsPage() {
   const params = useParams();
@@ -32,6 +71,21 @@ export default function ResourceDetailsPage() {
       try {
         setLoading(true);
         setErrorMessage("");
+
+        // Support sample resources and unconfigured Firebase
+        if (id.startsWith("sample-") || !isFirebaseConfigured()) {
+          const sample = DEFAULT_RESOURCES.find((r) => r.id === id);
+          if (sample) {
+            setResource(sample);
+            setLoading(false);
+            return;
+          }
+          if (!isFirebaseConfigured()) {
+            setErrorMessage("Firebase is not configured and resource was not found.");
+            setLoading(false);
+            return;
+          }
+        }
 
         const docRef = doc(db, "resources", id);
         const fetchPromise = getDoc(docRef);
@@ -60,11 +114,16 @@ export default function ResourceDetailsPage() {
         }
       } catch (error) {
         console.error("Error fetching resource details:", error);
-        setErrorMessage(
-          error instanceof Error
-            ? error.message
-            : "Unable to load resource details from Firebase."
-        );
+        const sample = DEFAULT_RESOURCES.find((r) => r.id === id);
+        if (sample) {
+          setResource(sample);
+        } else {
+          setErrorMessage(
+            error instanceof Error
+              ? error.message
+              : "Unable to load resource details from Firebase."
+          );
+        }
       } finally {
         setLoading(false);
       }

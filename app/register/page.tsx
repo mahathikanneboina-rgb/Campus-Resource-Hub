@@ -2,55 +2,81 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, isFirebaseConfigured } from "../resources/firebase.js";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth, isFirebaseConfigured } from "../resources/firebase";
 import "./register.css";
 
 export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleRegister = async (
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
+    setErrorMessage("");
 
     const cleanName = name.trim();
     const cleanEmail = email.trim();
 
     if (!cleanName) {
-      alert("Please enter your full name.");
+      setErrorMessage("Please enter your full name.");
       return;
     }
 
     if (!cleanEmail || !cleanEmail.includes("@")) {
-      alert("Please enter a valid email address.");
+      setErrorMessage("Please enter a valid email address.");
       return;
     }
 
     if (password.length < 6) {
-      alert("Password must contain at least 6 characters.");
+      setErrorMessage("Password must contain at least 6 characters.");
+      return;
+    }
+
+    if (!isFirebaseConfigured()) {
+      setErrorMessage("Firebase is not configured. Please check your environment variables.");
       return;
     }
 
     try {
-      localStorage.setItem("user_email", cleanEmail);
-      if (!isFirebaseConfigured()) {
-        window.location.href = "/dashboard";
-        return;
-      }
-
-      await createUserWithEmailAndPassword(
+      setLoading(true);
+      const userCredential = await createUserWithEmailAndPassword(
         auth,
         cleanEmail,
         password
       );
 
+      if (cleanName && userCredential.user) {
+        try {
+          await updateProfile(userCredential.user, {
+            displayName: cleanName,
+          });
+        } catch (profileError) {
+          console.warn("Could not set display name:", profileError);
+        }
+      }
+
+      localStorage.setItem("user_email", cleanEmail);
       window.location.href = "/dashboard";
     } catch (error: any) {
-      console.warn("Firebase registration fallback:", error);
-      window.location.href = "/dashboard";
+      console.error("Firebase registration error:", error);
+      let message = "Failed to create account. Please try again.";
+      if (error?.code === "auth/email-already-in-use") {
+        message = "This email is already in use. Please log in instead.";
+      } else if (error?.code === "auth/weak-password") {
+        message = "Password should be at least 6 characters.";
+      } else if (error?.code === "auth/invalid-email") {
+        message = "Invalid email address format.";
+      } else if (error?.message) {
+        message = error.message;
+      }
+      setErrorMessage(message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -68,6 +94,12 @@ export default function Register() {
         <p className="register-subtitle">
           Create your student account to access campus resources
         </p>
+
+        {errorMessage && (
+          <div className="auth-error" role="alert">
+            {errorMessage}
+          </div>
+        )}
 
         <form onSubmit={handleRegister}>
 
@@ -111,8 +143,8 @@ export default function Register() {
             required
           />
 
-          <button type="submit">
-            Create Account
+          <button type="submit" disabled={loading}>
+            {loading ? "Creating Account..." : "Create Account"}
           </button>
 
         </form>

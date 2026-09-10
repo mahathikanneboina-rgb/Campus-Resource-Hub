@@ -3,50 +3,65 @@
 import Link from "next/link";
 import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth, isFirebaseConfigured } from "../resources/firebase.js";
+import { auth, isFirebaseConfigured } from "../resources/firebase";
 import "./login.css";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleLogin = async (
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
+    setErrorMessage("");
 
     const cleanEmail = email.trim();
 
     if (!cleanEmail || !cleanEmail.includes("@")) {
-      alert("Please enter a valid email address.");
+      setErrorMessage("Please enter a valid email address.");
       return;
     }
 
     if (!password) {
-      alert("Please enter your password.");
+      setErrorMessage("Please enter your password.");
+      return;
+    }
+
+    if (!isFirebaseConfigured()) {
+      setErrorMessage("Firebase is not configured. Please check your environment variables.");
       return;
     }
 
     try {
-      localStorage.setItem("user_email", cleanEmail);
       setLoading(true);
-
-      if (!isFirebaseConfigured()) {
-        window.location.href = "/dashboard";
-        return;
-      }
-
       await signInWithEmailAndPassword(
         auth,
         cleanEmail,
         password
       );
 
+      localStorage.setItem("user_email", cleanEmail);
       window.location.href = "/dashboard";
     } catch (error: any) {
-      console.warn("Firebase login fallback:", error);
-      window.location.href = "/dashboard";
+      console.error("Firebase login error:", error);
+      let message = "Failed to log in. Please check your credentials.";
+      if (
+        error?.code === "auth/invalid-credential" ||
+        error?.code === "auth/user-not-found" ||
+        error?.code === "auth/wrong-password"
+      ) {
+        message = "Invalid email or password.";
+      } else if (error?.code === "auth/too-many-requests") {
+        message = "Too many failed attempts. Please try again later.";
+      } else if (error?.code === "auth/invalid-email") {
+        message = "Invalid email address format.";
+      } else if (error?.message) {
+        message = error.message;
+      }
+      setErrorMessage(message);
     } finally {
       setLoading(false);
     }
@@ -66,6 +81,12 @@ export default function Login() {
         <p className="login-subtitle">
           Login to access your campus resources
         </p>
+
+        {errorMessage && (
+          <div className="auth-error" role="alert">
+            {errorMessage}
+          </div>
+        )}
 
         <form onSubmit={handleLogin}>
 

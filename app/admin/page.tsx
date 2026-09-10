@@ -10,10 +10,9 @@ import {
   updateDoc,
   deleteDoc,
 } from "firebase/firestore";
-import { db, isFirebaseConfigured } from "../resources/firebase";
-import { useRouter } from 'next/navigation';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../resources/firebase';
+import { onAuthStateChanged } from "firebase/auth";
+import { useRouter } from "next/navigation";
+import { db, auth, isFirebaseConfigured } from "../resources/firebase";
 import "./admin.css";
 
 // Resource type matching Firestore schema
@@ -38,11 +37,11 @@ export default function AdminPage(): import("react").JSX.Element {
 
   // UI state
   const [loading, setLoading] = useState(false);
-const [authLoading, setAuthLoading] = useState(true);
-const router = useRouter();
+  const [authLoading, setAuthLoading] = useState(true);
   const [loadingResources, setLoadingResources] = useState(true);
   const [resources, setResources] = useState<Resource[]>([]);
   const [editingId, setEditingId] = useState<string>("");
+  const router = useRouter();
 
   // Fetch resources from Firestore
   const fetchResources = async () => {

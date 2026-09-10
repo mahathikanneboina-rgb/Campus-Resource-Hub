@@ -114,7 +114,7 @@
 
   display: grid;
 
-  grid-template-columns: repeat(3, 1fr) auto;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr auto;
 
   gap: 15px;
 
@@ -135,6 +135,30 @@
   font-size: 12px;
 
   font-weight: bold;
+}
+
+.filter-box input {
+  padding: 11px;
+
+  background: white;
+
+  border: 1px solid #d9cbb9;
+
+  border-radius: 6px;
+
+  color: #493a2a;
+
+  font-size: 13px;
+}
+
+.filter-box input:focus {
+  outline: none;
+
+  border-color: #b86b22;
+}
+
+.filter-box input::placeholder {
+  color: #aaa09a;
 }
 
 .filter-box select {
@@ -324,6 +348,14 @@
 .view-button {
   width: 100%;
 
+  display: block;
+
+  text-align: center;
+
+  text-decoration: none;
+
+  box-sizing: border-box;
+
   padding: 10px;
 
   border: none;
@@ -453,4 +485,44 @@
 .direct-link:hover {
   background: #fff8ed;
   border-color: #b86b22;
+}
+
+.reset-button {
+  margin-top: 15px;
+  padding: 10px 18px;
+  background: #b86b22;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.reset-button:hover {
+  background: #965619;
+}
+
+.resources-footer {
+  background: white;
+  border-top: 1px solid #eadfce;
+  padding: 25px 7%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: #887b6c;
+}
+
+.resources-footer p {
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .resources-footer {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+    padding: 20px 5%;
+  }
 }

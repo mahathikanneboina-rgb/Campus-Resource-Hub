@@ -328,6 +328,30 @@ export default function Resources() {
             <option value="2nd Semester">
               2nd Semester
             </option>
+
+            <option value="3rd Semester">
+              3rd Semester
+            </option>
+
+            <option value="4th Semester">
+              4th Semester
+            </option>
+
+            <option value="5th Semester">
+              5th Semester
+            </option>
+
+            <option value="6th Semester">
+              6th Semester
+            </option>
+
+            <option value="7th Semester">
+              7th Semester
+            </option>
+
+            <option value="8th Semester">
+              8th Semester
+            </option>
           </select>
         </div>
 
@@ -474,14 +498,25 @@ export default function Resources() {
 
                     </div>
 
-                    <Link
-                      className="view-button"
-                      href={`/resources/${resource.id}`}
-                    >
-                      View Resource
-                    </Link>
+                    {resource.id.startsWith("sample-") && resource.link ? (
+                      <a
+                        className="view-button"
+                        href={resource.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        View Resource ↗
+                      </a>
+                    ) : (
+                      <Link
+                        className="view-button"
+                        href={`/resources/${resource.id}`}
+                      >
+                        View Resource
+                      </Link>
+                    )}
 
-                    {resource.link && (
+                    {resource.link && !resource.id.startsWith("sample-") && (
                       <a
                         href={resource.link}
                         target="_blank"

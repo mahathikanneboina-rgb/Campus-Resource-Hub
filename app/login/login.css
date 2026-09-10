@@ -70,6 +70,18 @@
   flex-direction: column;
 }
 
+.auth-error {
+  background: #fdf2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 18px;
+  line-height: 1.4;
+  text-align: center;
+}
+
 .login-card label {
   color: #554a3f;
 

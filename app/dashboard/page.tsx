@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { auth } from "../resources/firebase.js";
+import { auth } from "../resources/firebase";
 import "./dashboard.css";
 
 export default function Dashboard() {
@@ -25,6 +25,7 @@ export default function Dashboard() {
 
   const handleLogout = async () => {
     try {
+      localStorage.removeItem("user_email");
       await signOut(auth);
       window.location.href = "/login";
     } catch (error) {
