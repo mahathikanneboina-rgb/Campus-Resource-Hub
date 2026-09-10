@@ -37,7 +37,7 @@ export default function Register() {
       return;
     }
 
-    if (!isFirebaseConfigured()) {
+    if (!isFirebaseConfigured() || !auth) {
       setErrorMessage("Firebase is not configured. Please check your environment variables.");
       return;
     }

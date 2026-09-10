@@ -30,7 +30,7 @@ export default function Login() {
       return;
     }
 
-    if (!isFirebaseConfigured()) {
+    if (!isFirebaseConfigured() || !auth) {
       setErrorMessage("Firebase is not configured. Please check your environment variables.");
       return;
     }

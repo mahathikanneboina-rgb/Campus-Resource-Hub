@@ -12,10 +12,19 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase only if an app instance doesn't already exist (handles Next.js fast refresh)
-const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+let app = null;
+let auth = null;
+let db = null;
 
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+try {
+  app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+  auth = getAuth(app);
+  db = getFirestore(app);
+} catch (error) {
+  console.error("Firebase initialization error:", error);
+}
+
+export { auth, db };
 
 export const isFirebaseConfigured = () => {
   const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
