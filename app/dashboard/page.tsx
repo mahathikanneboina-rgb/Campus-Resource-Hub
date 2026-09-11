@@ -11,6 +11,11 @@ export default function Dashboard() {
   const [userEmail, setUserEmail] = useState("");
 
   useEffect(() => {
+    if (!auth) {
+      setUserEmail(localStorage.getItem("user_email") || "Student User");
+      setCheckingUser(false);
+      return;
+    }
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setUserEmail(user.email || "Student User");
@@ -26,7 +31,9 @@ export default function Dashboard() {
   const handleLogout = async () => {
     try {
       localStorage.removeItem("user_email");
-      await signOut(auth);
+      if (auth) {
+        await signOut(auth);
+      }
       window.location.href = "/login";
     } catch (error) {
       console.error(error);

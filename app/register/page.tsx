@@ -71,6 +71,10 @@ export default function Register() {
         message = "Password should be at least 6 characters.";
       } else if (error?.code === "auth/invalid-email") {
         message = "Invalid email address format.";
+      } else if (error?.code === "auth/operation-not-allowed") {
+        message = "Email/Password sign-in is not enabled in Firebase Console. Please enable it under Authentication > Sign-in method.";
+      } else if (error?.code) {
+        message = `Firebase error [${error.code}]: ${error.message || "Registration failed"}`;
       } else if (error?.message) {
         message = error.message;
       }
