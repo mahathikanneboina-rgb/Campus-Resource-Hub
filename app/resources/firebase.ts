@@ -2,13 +2,26 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
+// These are Firebase Web App settings, not server credentials. Environment
+// variables can override them for forks or separate deployments.
+const defaultFirebaseConfig = {
+  apiKey: "AIzaSyA8R_5cNZ291fifAZaSKgPdTSc1d4svsI8",
+  authDomain: "r-campus-resource-hub.firebaseapp.com",
+  projectId: "r-campus-resource-hub",
+  storageBucket: "r-campus-resource-hub.firebasestorage.app",
+  messagingSenderId: "728080870325",
+  appId: "1:728080870325:web:51cf77e60b6b047ffdc7fc",
+};
+
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "",
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "",
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "",
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "",
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "",
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || defaultFirebaseConfig.apiKey,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || defaultFirebaseConfig.authDomain,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || defaultFirebaseConfig.projectId,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || defaultFirebaseConfig.storageBucket,
+  messagingSenderId:
+    process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ||
+    defaultFirebaseConfig.messagingSenderId,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || defaultFirebaseConfig.appId,
 };
 
 const isPlaceholderValue = (value: string | undefined): boolean => {
@@ -28,8 +41,8 @@ const isPlaceholderValue = (value: string | undefined): boolean => {
 };
 
 export const isFirebaseConfigured = (): boolean => {
-  const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
-  const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+  const apiKey = firebaseConfig.apiKey;
+  const projectId = firebaseConfig.projectId;
   return Boolean(
     !isPlaceholderValue(apiKey) && !isPlaceholderValue(projectId)
   );
