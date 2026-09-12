@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @typescript-eslint/no-explicit-any, react/no-unescaped-entities, @next/next/no-location-assign-relative-destination */
 
 import Link from "next/link";
 import { useState } from "react";

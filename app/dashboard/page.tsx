@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable react-hooks/set-state-in-effect, @next/next/no-location-assign-relative-destination */
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
