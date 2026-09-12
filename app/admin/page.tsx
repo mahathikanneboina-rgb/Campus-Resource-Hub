@@ -50,7 +50,7 @@ export default function AdminPage(): import("react").JSX.Element {
       return;
     }
     try {
-      const snapshot = await getDocs(collection(db, "resources"));
+      const snapshot = await getDocs(collection(db!, "resources"));
       const fetched: Resource[] = snapshot.docs.map((doc) => {
         const data = doc.data() as Omit<Resource, "id">;
         return { id: doc.id, ...data };
@@ -69,6 +69,11 @@ export default function AdminPage(): import("react").JSX.Element {
 
   // Ensure user is authenticated
   useEffect(() => {
+    if (!auth) {
+      router.replace("/login");
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!user) {
         router.replace('/login');
@@ -98,7 +103,7 @@ export default function AdminPage(): import("react").JSX.Element {
       return;
     }
     try {
-      await deleteDoc(doc(db, "resources", id));
+      await deleteDoc(doc(db!, "resources", id));
       alert("Resource deleted successfully!");
       fetchResources();
     } catch (e) {
@@ -126,7 +131,7 @@ export default function AdminPage(): import("react").JSX.Element {
       setLoading(true);
       if (editingId) {
         // Update existing document
-        const docRef = doc(db, "resources", editingId);
+        const docRef = doc(db!, "resources", editingId);
         await updateDoc(docRef, {
           title: cleanTitle,
           type,
@@ -138,7 +143,7 @@ export default function AdminPage(): import("react").JSX.Element {
         alert("Resource updated successfully!");
       } else {
         // Add new document
-        const addPromise = addDoc(collection(db, "resources"), {
+        const addPromise = addDoc(collection(db!, "resources"), {
           title: cleanTitle,
           type,
           branch,

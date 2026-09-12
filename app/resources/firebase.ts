@@ -11,23 +11,36 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "",
 };
 
+const isPlaceholderValue = (value: string | undefined): boolean => {
+  if (!value) return true;
+
+  const normalized = value.trim().toLowerCase();
+  return (
+    normalized === "" ||
+    normalized.includes("your_") ||
+    normalized.includes("your-") ||
+    normalized.includes("placeholder") ||
+    normalized.includes("replace_me") ||
+    normalized.includes("changeme") ||
+    normalized.endsWith("_firebase_api_key") ||
+    normalized.endsWith("_firebase_project_id")
+  );
+};
+
 export const isFirebaseConfigured = (): boolean => {
   const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
   const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
   return Boolean(
-    apiKey &&
-      projectId &&
-      apiKey.trim() !== "" &&
-      projectId.trim() !== "" &&
-      !apiKey.includes("your_api_key") &&
-      !apiKey.includes("YOUR_API_KEY") &&
-      !projectId.includes("your_project_id") &&
-      !projectId.includes("YOUR_PROJECT_ID")
+    !isPlaceholderValue(apiKey) && !isPlaceholderValue(projectId)
   );
 };
 
-const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+const app = isFirebaseConfigured()
+  ? getApps().length > 0
+    ? getApp()
+    : initializeApp(firebaseConfig)
+  : null;
+const auth = app ? getAuth(app) : null;
+const db = app ? getFirestore(app) : null;
 
 export { auth, db };

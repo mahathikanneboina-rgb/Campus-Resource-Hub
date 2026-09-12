@@ -87,7 +87,7 @@ export default function ResourceDetailsPage() {
           }
         }
 
-        const docRef = doc(db, "resources", id);
+        const docRef = doc(db!, "resources", id);
         const fetchPromise = getDoc(docRef);
         const timeoutPromise = new Promise<never>((_, reject) =>
           setTimeout(

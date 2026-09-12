@@ -79,7 +79,7 @@ export default function Resources() {
 
         console.log("Connecting to Firestore collection 'resources'...");
 
-        const fetchPromise = getDocs(collection(db, "resources"));
+        const fetchPromise = getDocs(collection(db!, "resources"));
         const timeoutPromise = new Promise<never>((_, reject) =>
           setTimeout(
             () =>
