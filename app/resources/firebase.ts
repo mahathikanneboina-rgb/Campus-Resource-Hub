@@ -13,17 +13,6 @@ const defaultFirebaseConfig = {
   appId: "1:728080870325:web:51cf77e60b6b047ffdc7fc",
 };
 
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || defaultFirebaseConfig.apiKey,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || defaultFirebaseConfig.authDomain,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || defaultFirebaseConfig.projectId,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || defaultFirebaseConfig.storageBucket,
-  messagingSenderId:
-    process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ||
-    defaultFirebaseConfig.messagingSenderId,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || defaultFirebaseConfig.appId,
-};
-
 const isPlaceholderValue = (value: string | undefined): boolean => {
   if (!value) return true;
 
@@ -40,11 +29,41 @@ const isPlaceholderValue = (value: string | undefined): boolean => {
   );
 };
 
+const configuredValue = (value: string | undefined, fallback: string): string =>
+  isPlaceholderValue(value) ? fallback : value ?? fallback;
+
+const firebaseConfig = {
+  apiKey: configuredValue(
+    process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    defaultFirebaseConfig.apiKey
+  ),
+  authDomain: configuredValue(
+    process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    defaultFirebaseConfig.authDomain
+  ),
+  projectId: configuredValue(
+    process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    defaultFirebaseConfig.projectId
+  ),
+  storageBucket: configuredValue(
+    process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    defaultFirebaseConfig.storageBucket
+  ),
+  messagingSenderId:
+    configuredValue(
+      process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+      defaultFirebaseConfig.messagingSenderId
+    ),
+  appId: configuredValue(
+    process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+    defaultFirebaseConfig.appId
+  ),
+};
+
 export const isFirebaseConfigured = (): boolean => {
-  const apiKey = firebaseConfig.apiKey;
-  const projectId = firebaseConfig.projectId;
   return Boolean(
-    !isPlaceholderValue(apiKey) && !isPlaceholderValue(projectId)
+    !isPlaceholderValue(firebaseConfig.apiKey) &&
+      !isPlaceholderValue(firebaseConfig.projectId)
   );
 };
 
