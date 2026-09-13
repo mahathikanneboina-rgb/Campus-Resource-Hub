@@ -1,0 +1,31 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn() &&
+        request.auth.token.email == 'mahathikanneboina@gmail.com';
+    }
+
+    function ownsExistingResource() {
+      return signedIn() && resource.data.ownerId == request.auth.uid;
+    }
+
+    function ownsNewResource() {
+      return signedIn() && request.resource.data.ownerId == request.auth.uid;
+    }
+
+    match /resources/{resourceId} {
+      allow read: if true;
+      allow create: if isAdmin() || ownsNewResource();
+      allow update: if isAdmin() ||
+        (ownsExistingResource() &&
+         request.resource.data.ownerId == resource.data.ownerId);
+      allow delete: if isAdmin() || ownsExistingResource();
+    }
+  }
+}

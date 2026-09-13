@@ -1,5 +1,4 @@
 "use client";
-/* eslint-disable react-hooks/set-state-in-effect */
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -11,9 +10,9 @@ import {
   updateDoc,
   deleteDoc,
 } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, type User } from "firebase/auth";
 import { useRouter } from "next/navigation";
-import { db, auth, isFirebaseConfigured } from "../resources/firebase";
+import { db, auth, isAdminEmail, isFirebaseConfigured } from "../resources/firebase";
 import "./admin.css";
 
 // Resource type matching Firestore schema
@@ -25,7 +24,12 @@ type Resource = {
   year: string;
   semester: string;
   link: string;
+  ownerId?: string;
+  ownerEmail?: string;
 };
+
+const isOwnerOrAdmin = (resource: Resource, user: User | null) =>
+  Boolean(user && (isAdminEmail(user.email) || resource.ownerId === user.uid));
 
 export default function AdminPage(): import("react").JSX.Element {
   // Form fields (used for both add and edit)
@@ -42,6 +46,7 @@ export default function AdminPage(): import("react").JSX.Element {
   const [loadingResources, setLoadingResources] = useState(true);
   const [resources, setResources] = useState<Resource[]>([]);
   const [editingId, setEditingId] = useState<string>("");
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const router = useRouter();
 
   // Fetch resources from Firestore
@@ -64,10 +69,6 @@ export default function AdminPage(): import("react").JSX.Element {
     }
   };
 
-  useEffect(() => {
-    fetchResources();
-  }, []);
-
   // Ensure user is authenticated
   useEffect(() => {
     if (!auth) {
@@ -78,8 +79,14 @@ export default function AdminPage(): import("react").JSX.Element {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!user) {
         router.replace('/login');
-      } else {
+      } else if (!isAdminEmail(user.email)) {
+        setCurrentUser(user);
         setAuthLoading(false);
+        fetchResources();
+      } else {
+        setCurrentUser(user);
+        setAuthLoading(false);
+        fetchResources();
       }
     });
     return () => unsubscribe();
@@ -99,6 +106,11 @@ export default function AdminPage(): import("react").JSX.Element {
   const handleDelete = async (id: string) => {
     const confirmed = window.confirm("Are you sure you want to delete this resource?");
     if (!confirmed) return;
+    const resource = resources.find((item) => item.id === id);
+    if (!resource || !isOwnerOrAdmin(resource, currentUser)) {
+      alert("You can only delete resources that you created.");
+      return;
+    }
     if (!isFirebaseConfigured()) {
       alert("Firebase not configured properly.");
       return;
@@ -131,6 +143,11 @@ export default function AdminPage(): import("react").JSX.Element {
     try {
       setLoading(true);
       if (editingId) {
+        const existing = resources.find((item) => item.id === editingId);
+        if (!existing || !isOwnerOrAdmin(existing, currentUser)) {
+          alert("You can only edit resources that you created.");
+          return;
+        }
         // Update existing document
         const docRef = doc(db!, "resources", editingId);
         await updateDoc(docRef, {
@@ -140,6 +157,7 @@ export default function AdminPage(): import("react").JSX.Element {
           year,
           semester,
           link: cleanLink,
+          updatedAt: new Date(),
         });
         alert("Resource updated successfully!");
       } else {
@@ -151,6 +169,8 @@ export default function AdminPage(): import("react").JSX.Element {
           year,
           semester,
           link: cleanLink,
+          ownerId: currentUser?.uid,
+          ownerEmail: currentUser?.email?.toLowerCase(),
           createdAt: new Date(),
         });
         const timeoutPromise = new Promise((_, reject) =>
@@ -234,20 +254,20 @@ return (
                     <span>{res.year}</span>
                     <span>{res.semester}</span>
                   </div>
-                  <button
+                  {isOwnerOrAdmin(res, currentUser) && <button
                     className="view-button"
                     style={{ background: "#6b8ac2" }}
                     onClick={() => startEdit(res)}
                   >
                     Edit
-                  </button>
-                  <button
+                  </button>}
+                  {isOwnerOrAdmin(res, currentUser) && <button
                     className="view-button"
                     style={{ background: "#c04b4b", marginLeft: "8px" }}
                     onClick={() => handleDelete(res.id)}
                   >
                     Delete
-                  </button>
+                  </button>}
                 </div>
               ))}
             </div>

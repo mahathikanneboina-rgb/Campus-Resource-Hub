@@ -13,6 +13,11 @@ const defaultFirebaseConfig = {
   appId: "1:728080870325:web:51cf77e60b6b047ffdc7fc",
 };
 
+export const ADMIN_EMAIL = "mahathikanneboina@gmail.com";
+
+export const isAdminEmail = (email: string | null | undefined): boolean =>
+  email?.trim().toLowerCase() === ADMIN_EMAIL;
+
 const isPlaceholderValue = (value: string | undefined): boolean => {
   if (!value) return true;
 

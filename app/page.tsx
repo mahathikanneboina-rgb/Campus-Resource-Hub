@@ -284,6 +284,10 @@ export default function Home() {
             Login
           </Link>
 
+          <Link href="/admin-login">
+            Admin Login
+          </Link>
+
         </div>
 
       </footer>
